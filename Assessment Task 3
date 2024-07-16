@@ -1,0 +1,28 @@
+import numpy as np
+
+# Define a function for linear regression using normal equation
+def linear_regression(X, y):
+    # Add a column of ones to X for the intercept term
+    X = np.hstack((np.ones((X.shape[0], 1)), X))
+    
+    # Calculate coefficients using the normal equation: beta = (X'X)^-1 X'y
+    beta = np.linalg.inv(X.T @ X) @ X.T @ y
+    
+    return beta
+
+# Example data (you can replace this with your own dataset)
+X = np.array([[1], [2], [3], [4], [5]])
+y = np.array([2, 4, 5, 4, 5])
+
+# Train the model using the example data
+beta = linear_regression(X, y)
+
+# Print the coefficients (parameters)
+print(f"Coefficients: {beta}")
+
+# Predictions on the example data
+X_bias = np.hstack((np.ones((X.shape[0], 1)), X))
+y_pred = X_bias @ beta
+
+# Print predictions
+print(f"Predictions: {y_pred}")
