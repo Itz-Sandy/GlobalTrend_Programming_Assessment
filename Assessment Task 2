@@ -1,0 +1,57 @@
+import http.client
+from time import sleep
+from urllib.parse import urlparse
+
+def download_urls(urls):
+    results = []
+    for url in urls:
+        parsed_url = urlparse(url)
+        for attempt in range(3):
+            try:
+                # Determine the correct connection type (HTTP or HTTPS)
+                if parsed_url.scheme == 'https':
+                    conn = http.client.HTTPSConnection(parsed_url.netloc, timeout=5)
+                else:
+                    conn = http.client.HTTPConnection(parsed_url.netloc, timeout=5)
+                
+                # Send the GET request
+                path = parsed_url.path or '/'
+                if parsed_url.query:
+                    path += '?' + parsed_url.query
+                conn.request("GET", path)
+                
+                # Get the response
+                response = conn.getresponse()
+                
+                # Check if the response status is 200 OK
+                if response.status == 200:
+                    content = response.read().decode('utf-8')
+                    results.append((url, content))
+                    print(f"Successfully downloaded content from {url}")
+                    conn.close()
+                    break
+                else:
+                    print(f"HTTP error occurred for {url}: {response.status} - {response.reason}")
+                    conn.close()
+            except Exception as e:
+                print(f"General error occurred for {url}: {e}")
+            if attempt < 2:
+                print(f"Retrying {url} in 1 second...")
+                sleep(1)
+            else:
+                print(f"Failed to download {url} after 3 attempts.")
+                results.append((url, None))
+    return results
+
+# Example usage:
+urls = [
+    'https://www.example.com',  # A valid URL
+    'https://www.invalid-url.com'  # An invalid URL to simulate an error
+]
+
+downloaded_content = download_urls(urls)
+for url, content in downloaded_content:
+    if content is not None:
+        print(f"Downloaded from {url}:\n{content[:100]}...\n")  # Print first 100 characters
+    else:
+        print(f"Failed to download from {url}\n")
