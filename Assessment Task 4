@@ -1,0 +1,21 @@
+import pandas as pd
+import numpy as np
+
+# Sample data
+data = {
+    'numeric_col1': [1, 2, None, 4],
+    'numeric_col2': [10, 20, 30, None],
+    'category_col': ['A', 'B', 'A', 'C']
+}
+df = pd.DataFrame(data)
+
+# Handle missing values in numeric columns
+df['numeric_col1'].fillna(df['numeric_col1'].mean(), inplace=True)
+df['numeric_col2'].fillna(df['numeric_col2'].mean(), inplace=True)
+
+# One-hot encoding for categorical column
+df = pd.get_dummies(df, columns=['category_col'])
+
+# Print processed DataFrame
+print("Processed DataFrame:")
+print(df)
